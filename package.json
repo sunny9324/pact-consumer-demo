@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test:consumer": "jest consumer.test.js",
-    "publish:pact": "pact-broker publish ./pacts --broker-base-url $PACT_BROKER_URL --broker-token $PACT_BROKER_TOKEN --consumer-app-version $GIT_COMMIT"
-  },
+"scripts": {
+  "test:consumer": "jest",
+  "publish:pact": "pact-broker publish ./pacts --broker-base-url $PACT_BROKER_URL --broker-token $PACT_BROKER_TOKEN --consumer-app-version $GIT_COMMIT"
+},
   "keywords": [],
   "author": "Someone",
   "license": "ISC",
