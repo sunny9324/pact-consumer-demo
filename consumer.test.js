@@ -2,14 +2,14 @@ const { PactV3 } = require('@pact-foundation/pact');
 const axios = require('axios');
 const path = require('path');
 
-// 1. Configure the mock server using PactV3
+// 1. Configure the mock server using PactV3...
 const provider = new PactV3({
   consumer: 'FrontendClient',
   provider: 'UserService',
   dir: path.resolve(process.cwd(), 'pacts'),
 });
 
-describe('User Service Pact', () => {
+describe('User Service Pact...', () => {
   it('generates a contract for fetching a user', () => {
     
     // 2. Define the contract rules

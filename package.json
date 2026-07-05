@@ -8,7 +8,7 @@
     "publish:pact": "pact-broker publish ./pacts --broker-base-url $PACT_BROKER_URL --broker-token $PACT_BROKER_TOKEN --consumer-app-version $GIT_COMMIT"
   },
   "keywords": [],
-  "author": "",
+  "author": "Someone",
   "license": "ISC",
   "dependencies": {
     "@pact-foundation/pact": "^17.0.1",
