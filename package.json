@@ -14,5 +14,8 @@
     "@pact-foundation/pact": "^17.0.1",
     "axios": "^1.18.1",
     "jest": "^30.4.2"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact-cli": "^18.1.1"
   }
 }
