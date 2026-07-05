@@ -1,17 +1,42 @@
+// ============================================================================
+// TECH STACK EXPLANATION (Why we are importing these specific packages)
+// ============================================================================
+
+// 1. @pact-foundation/pact (PactV3, MatchersV3)
+// WHY: This is the official Pact library for Node.js. 
+// - 'PactV3' is the core engine. We use it to spin up a local mock HTTP server 
+//   that intercepts our frontend's requests and generates the JSON contract file.
+// - 'MatchersV3' is a utility that allows us to test the "shape" of the data 
+//   (e.g., checking if a value is a string or a number) instead of hardcoding 
+//   exact values. This makes our tests resilient to database data changes.
 const { PactV3, MatchersV3 } = require('@pact-foundation/pact');
+
+// 2. axios
+// WHY: Axios is a popular promise-based HTTP client for Node.js and browsers. 
+// In this test, it simulates our frontend application making actual network 
+// requests to the Pact mock server. We use it to trigger the 'Act' phase of our test.
 const axios = require('axios');
+
+// 3. path
+// WHY: 'path' is a built-in Node.js module used for handling and transforming file paths.
+// We use it to dynamically resolve exactly where the generated JSON contract 
+// should be saved (the 'pacts' folder), ensuring the code works perfectly on 
+// both Windows and macOS/Linux machines without path formatting errors.
 const path = require('path');
 
-// INTERVIEW TALKING POINT: 
-// "I extract specific matchers like 'like', 'integer', and 'eachLike' because 
-// contract testing should validate the SCHEMA (types and structure) of the data, 
-// not the exact hardcoded state. This makes tests robust against database changes."
+// Extract the matchers we want to use to validate schemas
 const { like, integer, eachLike } = MatchersV3;
 
+// ============================================================================
+// PACT CONFIGURATION
+// ============================================================================
+// WHY: We initialize a new PactV3 instance to define the exact relationship 
+// between the consumer and the provider. The names used here MUST exactly 
+// match the names we intend to use in the PactFlow broker.
 const provider = new PactV3({
   consumer: 'petstore-consumer',
   provider: 'petstore-api',
-  dir: path.resolve(process.cwd(), 'pacts'),
+  dir: path.resolve(process.cwd(), 'pacts'), // Safely points to the current directory + /pacts
 });
 
 describe('Advanced Petstore API Contract Tests', () => {
@@ -50,9 +75,11 @@ describe('Advanced Petstore API Contract Tests', () => {
       });
 
     return provider.executeTest(async (mockServer) => {
+      // Act: Simulate the frontend making the POST request
       const response = await axios.post(`${mockServer.url}/pet`, newPetPayload, {
         headers: { 'Content-Type': 'application/json' }
       });
+      // Assert: Verify the mock server responded as expected
       expect(response.status).toBe(200);
       expect(response.data.name).toBe('Buddy');
     });
@@ -86,7 +113,10 @@ describe('Advanced Petstore API Contract Tests', () => {
       });
 
     return provider.executeTest(async (mockServer) => {
+      // Act: Simulate the frontend requesting the list of available pets
       const response = await axios.get(`${mockServer.url}/pet/findByStatus?status=available`);
+      
+      // Assert: Verify we got a 200 status and an array containing the expected schema
       expect(response.status).toBe(200);
       expect(Array.isArray(response.data)).toBe(true);
       expect(response.data[0].status).toBe('available');
@@ -121,9 +151,10 @@ describe('Advanced Petstore API Contract Tests', () => {
 
     return provider.executeTest(async (mockServer) => {
       try {
+        // Act: Attempt to fetch a pet that we declared does not exist
         await axios.get(`${mockServer.url}/pet/9999`);
       } catch (error) {
-        // We assert against the error object thrown by Axios for 4xx responses
+        // Assert: We assert against the error object thrown by Axios for 4xx responses
         expect(error.response.status).toBe(404);
         expect(error.response.data.message).toBe('Pet not found');
       }
@@ -165,9 +196,11 @@ describe('Advanced Petstore API Contract Tests', () => {
       });
 
     return provider.executeTest(async (mockServer) => {
+      // Act: Simulate the frontend updating the pet's status
       const response = await axios.put(`${mockServer.url}/pet`, updatePayload, {
         headers: { 'Content-Type': 'application/json' }
       });
+      // Assert: Verify the status successfully updated
       expect(response.status).toBe(200);
       expect(response.data.status).toBe('sold');
     });
